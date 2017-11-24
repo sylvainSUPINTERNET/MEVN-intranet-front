@@ -1,6 +1,16 @@
 <template>
   <div id="app">
+    <link rel="stylesheet" href="../node_modules/materialize-css/dist/css/materialize.min.css">
+
+    <md-toolbar>
+      <h1 class="md-title">Best intranet EUW</h1>
+    </md-toolbar>
+
+
+    <!--
     <img src="./assets/logo.png">
+    -->
+
     <router-view/>
   </div>
 </template>
@@ -18,6 +28,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

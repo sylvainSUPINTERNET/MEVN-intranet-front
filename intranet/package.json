@@ -13,7 +13,15 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.17.1",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.6",
     "vue": "^2.5.2",
+    "vue-axios": "^2.0.2",
+    "vue-cookie": "^1.1.4",
+    "vue-cookies": "^1.5.4",
+    "vue-js-cookie": "^2.1.0",
+    "vue-material": "^1.0.0-beta-5",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
