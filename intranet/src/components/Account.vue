@@ -113,7 +113,12 @@
       loginError: "",
 
       /* logout */
-      //todo : logout + display
+      //todo : logout + display (use token from data)
+      // On this.current_user_token faire un v-if is undefined => display login / logout
+      // if it's defined => logout (and add new method cookie.remove('token')
+
+      /* token */
+      current_user_token: cookie.get('token'),
 
     }),
     methods: {
@@ -139,8 +144,8 @@
 
           if(!email || !name || !password || !passwordConfirmed){
               this.registerError = "Please fill all fields for register !"
-            console.log(this.registerError);
           }else{
+            console.log("CURRENT_USER_TOKEN ====> " + this.current_user_token );
             //for test : http://jsonplaceholder.typicode.com/posts
             axios.post(`http://localhost:1337/user/add`, {
               body: this.registerData
@@ -149,6 +154,7 @@
                 console.log(response.data);
                 if(response.data.error === false){
                     cookie.set('token', response.data.token, 1);
+
                 }else{
                     this.registerError = response.data.message
                 }
@@ -171,6 +177,8 @@
           this.loginError = "Please fill all fields for login !"
           console.log(this.loginError);
         }else{
+            console.log("CURRENT_USER_TOKEN ====> " + this.current_user_token );
+
           //for test : http://jsonplaceholder.typicode.com/posts
           axios.post(`http://localhost:1337/user/login`, {
             body: this.loginData
@@ -179,6 +187,8 @@
               console.log(response.data);
               if(response.data.error === false){
                 cookie.set('token', response.data.token, 1);
+
+
               }else{
                 this.loginError = response.data.message
               }
