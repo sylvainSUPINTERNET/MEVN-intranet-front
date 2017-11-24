@@ -48,7 +48,7 @@
       <md-app-content>
         {{ messageHome }}
 
-        <form novalidate class="md-layout-row md-gutter" @submit.prevent="registerUser">
+        <form novalidate @submit.prevent="registerUser">
           <md-card class="md-flex-50 md-flex-small-100">
             <md-card-header>
               <div class="md-title">Register user</div>
@@ -65,12 +65,15 @@
               <label for="passwordConfirmed">Password confirmed</label>
               <input id="passwordConfirmed" name="register_passwordConfirmed" type="password" v-model="registerData.passwordConfirmed">
               <br>
-              <input type="submit" value="register">
+              <input href="javascript:void(0)" class="waves-effect waves-light" type="submit" value="register">
             </md-card-header>
           </md-card>
         </form>
 
-        <form novalidate class="md-layout-row md-gutter" @submit.prevent="loginUser">
+        <br>
+
+
+        <form novalidate @submit.prevent="loginUser">
           <md-card class="md-flex-50 md-flex-small-100">
             <md-card-header>
               <div class="md-title">Login user</div>
@@ -81,7 +84,7 @@
               <label for="password">Password</label>
               <input id="login_password" type="password" name="login_password" v-model="loginData.password">
               <br>
-              <input type="submit" value="login">
+              <input href="javascript:void(0)" class="waves-effect waves-light" type="submit" value="login">
             </md-card-header>
           </md-card>
         </form>
@@ -99,7 +102,7 @@
     name: 'Home',
     data: () => ({
       menuVisible: false,
-      messageHome: "Registration / login",
+      messageHome: "Authentification",
 
       /*register*/
       registerData : {},
@@ -108,6 +111,9 @@
       /*login*/
       loginData: {},
       loginError: "",
+
+      /* logout */
+      //todo : logout + display
 
     }),
     methods: {
@@ -162,8 +168,8 @@
         let password = this.loginData.password;
 
         if(!email || !password){
-          this.loginData = "Please fill all fields for login !"
-          console.log(this.loginData);
+          this.loginError = "Please fill all fields for login !"
+          console.log(this.loginError);
         }else{
           //for test : http://jsonplaceholder.typicode.com/posts
           axios.post(`http://localhost:1337/user/login`, {
