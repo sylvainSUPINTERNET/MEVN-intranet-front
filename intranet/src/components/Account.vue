@@ -70,6 +70,22 @@
           </md-card>
         </form>
 
+        <form novalidate class="md-layout-row md-gutter" @submit.prevent="loginUser">
+          <md-card class="md-flex-50 md-flex-small-100">
+            <md-card-header>
+              <div class="md-title">Login user</div>
+              <br>
+              <label for="email">Email</label>
+              <input id="login_email" type="email" name="login_email" v-model="loginData.email">
+              <br>
+              <label for="password">Password</label>
+              <input id="login_password" type="password" name="login_password" v-model="loginData.password">
+              <br>
+              <input type="submit" value="login">
+            </md-card-header>
+          </md-card>
+        </form>
+
       </md-app-content>
     </md-app>
   </div>
@@ -87,7 +103,11 @@
 
       /*register*/
       registerData : {},
-      registerError: ""
+      registerError: "",
+
+      /*login*/
+      loginData: {},
+      loginError: "",
 
     }),
     methods: {
@@ -105,7 +125,6 @@
       },
 
       /* register */
-
       registerUser() {
           let name = this.registerData.name;
           let password = this.registerData.password;
@@ -134,6 +153,36 @@
                 this.registerError = e;
               })
           }
+
+      },
+
+      /* login */
+      loginUser() {
+        let email = this.loginData.email;
+        let password = this.loginData.password;
+
+        if(!email || !password){
+          this.loginData = "Please fill all fields for login !"
+          console.log(this.loginData);
+        }else{
+          //for test : http://jsonplaceholder.typicode.com/posts
+          axios.post(`http://localhost:1337/user/login`, {
+            body: this.loginData
+          })
+            .then(function(response){
+              console.log(response.data);
+              if(response.data.error === false){
+                cookie.set('token', response.data.token, 1);
+              }else{
+                this.loginError = response.data.message
+              }
+
+
+            })
+            .catch(e => {
+              this.loginError = e;
+            })
+        }
 
       },
     }
