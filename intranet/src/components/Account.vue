@@ -123,9 +123,7 @@
               .then(function(response){
                 console.log(response.data);
                 if(response.data.error === false){
-                    console.log("TODO: set cookie 'token' response.data.token");
-                  //TODO: set cookie "token" response.data.token
-                  cookie.set('token', response.data.token, 1);
+                    cookie.set('token', response.data.token, 1);
                 }else{
                     this.registerError = response.data.message
                 }
