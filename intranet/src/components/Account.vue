@@ -3,6 +3,7 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
 
+    <div class="signUpAndIn" v-show="!current_user_token">
     <md-app>
       <md-app-toolbar class="md-primary" md-elevation="0">
         <md-button class="md-icon-button" @click="toggleMenu" v-if="!menuVisible">
@@ -25,7 +26,7 @@
 
           <md-list-item>
             <md-icon @click="goAccount">account_circle</md-icon>
-            <span class="md-list-item-text" @click="goAccount" style="cursor: pointer">Sign up / Sign In</span>
+            <span class="md-list-item-text" @click="goAccount" style="cursor: pointer">Account</span>
           </md-list-item>
 
           <md-subheader class="md-inset"></md-subheader>
@@ -38,6 +39,11 @@
           <md-list-item>
             <md-icon @click="goTrombinoscope">perm_identity</md-icon>
             <span class="md-list-item-text" @click="goTrombinoscope" style="cursor: pointer">Trombinoscope</span>
+          </md-list-item>
+
+          <md-list-item>
+            <md-icon @click="goGrade">school</md-icon>
+            <span class="md-list-item-text" @click="goGrade" style="cursor: pointer">Grade</span>
           </md-list-item>
 
 
@@ -92,12 +98,75 @@
       </md-app-content>
     </md-app>
   </div>
+
+    <!-- logout only if user has token -->
+    <div class="signUpAndIn" v-show="current_user_token">
+      <md-app>
+        <md-app-toolbar class="md-primary" md-elevation="0">
+          <md-button class="md-icon-button" @click="toggleMenu" v-if="!menuVisible">
+            <md-icon>menu</md-icon>
+          </md-button>
+          <span class="md-title">Account</span>
+        </md-app-toolbar>
+
+        <md-app-drawer :md-active.sync="menuVisible" md-persistent="mini">
+          <md-toolbar class="md-transparent" md-elevation="0">
+            <span>Intranet - EUW</span>
+            <div class="md-toolbar-section-end">
+              <md-button class="md-icon-button md-dense" @click="toggleMenu">
+                <md-icon>keyboard_arrow_left</md-icon>
+              </md-button>
+            </div>
+          </md-toolbar>
+
+          <md-list>
+
+            <md-list-item>
+              <md-icon @click="goAccount">account_circle</md-icon>
+              <span class="md-list-item-text" @click="goAccount" style="cursor: pointer">Sign up / Sign In</span>
+            </md-list-item>
+
+            <md-subheader class="md-inset"></md-subheader>
+
+            <md-list-item>
+              <md-icon @click="goTrombinoscope">home</md-icon>
+              <span class="md-list-item-text" @click="goHome" style="cursor: pointer">Home</span>
+            </md-list-item>
+
+            <md-list-item>
+              <md-icon @click="goTrombinoscope">perm_identity</md-icon>
+              <span class="md-list-item-text" @click="goTrombinoscope" style="cursor: pointer">Trombinoscope</span>
+            </md-list-item>
+
+            <md-list-item>
+              <md-icon @click="goMater">import_contacts</md-icon>
+              <span class="md-list-item-text" @click="goMater" style="cursor: pointer">Mater</span>
+            </md-list-item>
+
+            <md-list-item>
+              <md-icon @click="goGrade">school</md-icon>
+              <span class="md-list-item-text" @click="goGrade" style="cursor: pointer">Grade</span>
+            </md-list-item>
+
+          </md-list>
+
+        </md-app-drawer>
+
+        <md-app-content>
+          <p>Logout</p>
+          <button v-on:click="logoutUser">Se déconnecter</button>
+        </md-app-content>
+      </md-app>
+    </div>
+  </div>
 </template>
 
 <script>
 
   import axios from 'axios'
   import cookie from 'vue-js-cookie'
+
+
   export default {
     name: 'Home',
     data: () => ({
@@ -114,13 +183,21 @@
 
       /* logout */
       //todo : logout + display (use token from data)
-      // On this.current_user_token faire un v-if is undefined => display login / logout
+      // On this.current_user_token faire un v-if sur template is undefined => display login / logout
       // if it's defined => logout (and add new method cookie.remove('token')
 
       /* token */
       current_user_token: cookie.get('token'),
 
+      /* TEST */
+     // connected: false, // set à true if user is connected et display le bon template
+      // ca marche, mettre dans la balise html container un v-show on true or false (correspond à une variable connected en boolean qui sera set si le token is defined)
+
+
     }),
+    computed: {
+
+    },
     methods: {
       toggleMenu () {
         this.menuVisible = !this.menuVisible
@@ -134,9 +211,17 @@
       goTrombinoscope(){
         this.$router.push('/trombinoscope')
       },
+      goMater(){
+        this.$router.push('/mater')
+      },
+      goGrade(){
+        this.$router.push('/grade');
+      },
 
       /* register */
       registerUser() {
+        var self = this;
+
           let name = this.registerData.name;
           let password = this.registerData.password;
           let passwordConfirmed = this.registerData.passwordConfirmed;
@@ -144,27 +229,31 @@
 
           if(!email || !name || !password || !passwordConfirmed){
               this.registerError = "Please fill all fields for register !"
+            console.log(this.registerError);
           }else{
-            console.log("CURRENT_USER_TOKEN ====> " + this.current_user_token );
             //for test : http://jsonplaceholder.typicode.com/posts
             axios.post(`http://localhost:1337/user/add`, {
               body: this.registerData
             })
               .then(function(response){
-                console.log(response.data);
                 if(response.data.error === false){
                     cookie.set('token', response.data.token, 1);
+                  self.current_user_token = cookie.get('token')
+                  console.log(self.current_user_token);
 
                 }else{
-                    this.registerError = response.data.message
+                    this.registerError = response.data
                 }
 
 
               })
               .catch(e => {
                 this.registerError = e;
-              })
+              });
+
+
           }
+        location.reload();
 
       },
 
@@ -172,6 +261,7 @@
       loginUser() {
         let email = this.loginData.email;
         let password = this.loginData.password;
+        var self = this;
 
         if(!email || !password){
           this.loginError = "Please fill all fields for login !"
@@ -187,6 +277,8 @@
               console.log(response.data);
               if(response.data.error === false){
                 cookie.set('token', response.data.token, 1);
+                self.current_user_token = cookie.get('token')
+
 
 
               }else{
@@ -199,8 +291,14 @@
               this.loginError = e;
             })
         }
-
+      location.reload();
       },
+
+      logoutUser() {
+          console.log("logout");
+          cookie.remove('token');
+          location.reload();
+      }
     }
   }
 </script>
