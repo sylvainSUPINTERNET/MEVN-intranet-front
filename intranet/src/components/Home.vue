@@ -2,8 +2,8 @@
   <div class="page-container">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <div class="home_connected" v-show="current_user_token">
 
+    <div class="home_connected" v-show="current_user_token">
     <md-app>
       <md-app-toolbar class="md-primary" md-elevation="0">
         <md-button class="md-icon-button" @click="toggleMenu" v-if="!menuVisible">
@@ -11,6 +11,8 @@
         </md-button>
         <span class="md-title">Home</span>
       </md-app-toolbar>
+
+
 
       <md-app-drawer :md-active.sync="menuVisible" md-persistent="mini">
         <md-toolbar class="md-transparent" md-elevation="0">
@@ -58,21 +60,19 @@
 
       <md-app-content>
         <h2>{{ messageHome }}</h2>
-<br>
+        <br>
         token : {{ current_user_token }}
         <br>
-        name : {{profile[0].name}}
-        <br>
-        email : {{profile[0].email}}
-        <br>
-        role : {{profile[0].role}}
+
+       {{profile[0]}}
       </md-app-content>
+
     </md-app>
     </div>
 
 
     <!-- logout only if user has token -->
-    <div class="signUpAndIn" v-show="!current_user_token">
+    <div class="home_not_connected" v-show="!current_user_token">
       <md-app>
         <md-app-toolbar class="md-primary" md-elevation="0">
           <md-button class="md-icon-button" @click="toggleMenu" v-if="!menuVisible">
