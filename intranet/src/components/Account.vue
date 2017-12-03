@@ -77,6 +77,22 @@
         </form>
 
         <br>
+        <div v-if="registerError !== null" style="color:red">
+          {{registerError.email}}
+          <br>
+          {{registerError.password}}
+          <br>
+          {{registerError.passwordConfirmed}}
+          <br>
+          {{registerError.name}}
+          <br>
+        </div>
+
+        <div v-if="registerErrorForm !== null" style="color:red">
+          {{registerErrorForm}}
+          <br>
+        </div>
+
 
 
         <form novalidate @submit.prevent="loginUser">
@@ -94,6 +110,18 @@
             </md-card-header>
           </md-card>
         </form>
+
+
+        <div v-if="loginError !== null" style="color:red">
+          {{loginError}}
+        </div>
+
+
+        <div v-if="loginErrorForm !== null" style="color:red">
+          <br>
+          {{loginErrorForm}}
+          <br>
+        </div>
 
       </md-app-content>
     </md-app>
@@ -173,25 +201,27 @@
       menuVisible: false,
       messageHome: "Authentification",
 
+      /* modal */
+      alertError: false,
+
       /*register*/
       registerData : {},
-      registerError: "",
+      registerError: null,
+      registerErrorForm : null,
+
 
       /*login*/
       loginData: {},
-      loginError: "",
+      loginError: null,
+      loginErrorForm : null,
+
 
       /* logout */
-      //todo : logout + display (use token from data)
-      // On this.current_user_token faire un v-if sur template is undefined => display login / logout
-      // if it's defined => logout (and add new method cookie.remove('token')
+
 
       /* token */
       current_user_token: cookie.get('token'),
 
-      /* TEST */
-     // connected: false, // set à true if user is connected et display le bon template
-      // ca marche, mettre dans la balise html container un v-show on true or false (correspond à une variable connected en boolean qui sera set si le token is defined)
 
 
     }),
@@ -228,21 +258,26 @@
           let email = this.registerData.email;
 
           if(!email || !name || !password || !passwordConfirmed){
-              this.registerError = "Please fill all fields for register !"
-            console.log(this.registerError);
+              this.registerErrorForm = "Please fill all fields for register !"
+            //error works
           }else{
-            //for test : http://jsonplaceholder.typicode.com/posts
+              self.registerErrorForm = null;
             axios.post(`http://localhost:1337/user/add`, {
               body: this.registerData
             })
               .then(function(response){
+
+                  if(response.data.error === true){
+                    console.log(response.data);
+                    self.registerError = response.data;
+                    console.log(self.registerError);
+                  }
+
                 if(response.data.error === false){
-                    cookie.set('token', response.data.token, 1);
+                  cookie.set('token', response.data.token, 1);
                   self.current_user_token = cookie.get('token')
                   console.log(self.current_user_token);
-
-                }else{
-                    this.registerError = response.data
+                  //location.reload();
                 }
 
 
@@ -253,7 +288,8 @@
 
 
           }
-        location.reload();
+
+          //location.reload();
 
       },
 
@@ -264,10 +300,10 @@
         var self = this;
 
         if(!email || !password){
-          this.loginError = "Please fill all fields for login !"
+          this.loginErrorForm = "Please fill all fields for login !"
           console.log(this.loginError);
         }else{
-            console.log("CURRENT_USER_TOKEN ====> " + this.current_user_token );
+            console.log("CURRENT_USER_TOKEN ====> " + self.current_user_token );
 
           //for test : http://jsonplaceholder.typicode.com/posts
           axios.post(`http://localhost:1337/user/login`, {
@@ -279,10 +315,9 @@
                 cookie.set('token', response.data.token, 1);
                 self.current_user_token = cookie.get('token')
 
-
-
               }else{
-                this.loginError = response.data.message
+                self.loginErrorForm = null;
+                  self.loginError = response.data.message
               }
 
 
@@ -291,7 +326,7 @@
               this.loginError = e;
             })
         }
-      location.reload();
+     // location.reload();
       },
 
       logoutUser() {

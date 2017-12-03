@@ -73,7 +73,7 @@
         </md-app-content>
 
         <md-app-content>
-          <h4>Ajouter une note à un user (update auto de la matière avec cette note)</h4>
+          <h4>Ajouter une note à un user</h4>
           <form novalidate @submit.prevent="addGrade">
             <md-field>
               <md-select v-model="addGradeData.grade_user" name="user" id="user" placeholder="User">
@@ -94,8 +94,19 @@
             </label>
             <input id="grade_total" type="number" name="grade_total" v-model="addGradeData.grade_total">
 
-            <input href="javascript:void(0)" class="waves-effect waves-light" type="submit" value="add user to mater">
+            <input href="javascript:void(0)" class="waves-effect waves-light" type="submit" value="add user's grade">
           </form>
+
+          <div v-if="addGradeError !== null" style="color:red">
+            {{addGradeError}}
+          </div>
+
+          <div v-if="addGradeErrorForm !== null" style="color:red">
+            <br>
+            {{addGradeErrorForm}}
+            <br>
+          </div>
+
         </md-app-content>
 
       </md-app>
@@ -184,6 +195,9 @@
         addGradeData: {},
         deleteGradeData: {},
 
+        addGradeError: null,
+        addGradeErrorForm : null,
+
       }
     },
     computed: {
@@ -219,17 +233,32 @@
 
 
       addGrade(){
-        axios.post(`http://localhost:1337/grade/add`, {
-          body: this.addGradeData
-        })
-          .then(function(response){
-            console.log(response.data.message);
-          })
-          .catch(e => {
-            console.log(e);
-          });
-          console.log("add grade", this.addGradeData);
-          location.reload()
+          var self = this;
+
+          if(!self.addGradeData.grade_value || !self.addGradeData.grade_total || !self.addGradeData.grade_mater || !self.addGradeData.grade_user ){
+              self.addGradeErrorForm = "Please filled all fields";
+          }else{
+            self.addGradeErrorForm = null;
+
+            axios.post(`http://localhost:1337/grade/add`, {
+              body: this.addGradeData
+            })
+              .then(function(response){
+                if(response.data.error === true){
+                  console.log(response.data.message);
+                  self.addGradeError = response.data.message;
+                  console.log("error", response.data.message )
+                }else{
+                  self.addGradeErrorForm = null;
+                  self.addGradeError = null;
+                }
+              });
+            location.reload();
+          }
+
+
+
+
       },
 
 

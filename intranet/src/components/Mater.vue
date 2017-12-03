@@ -56,17 +56,55 @@
         </md-app-drawer>
 
         <md-app-content>
-         <h4>Liste des matières</h4>
-
+          <!--
           <ul v-for="mater in maters[0]">
             <li>
-              id : {{ mater.name }}
+              {{ mater.name }}
               <br>
               users : {{ mater.users }}
               <br>
               grades : {{ mater.grades }}
               <br>
             </li>
+          </ul>
+          -->
+
+
+
+          <ul v-for="mater in maters[0]">
+
+            <md-card md-with-hover>
+              <md-ripple>
+                <md-card-header>
+                  <div class="md-title">{{ mater.name }}</div>
+                </md-card-header>
+
+                <md-card-content>
+                  <br>
+                  <br>
+                  <div class="md-subhead">List of users </div>
+                  <!--
+                  <ul>
+                    <li v-for="mater in user.maters">
+                      {{mater.name}}
+                    </li>
+                  </ul>
+                  -->
+
+                  <ul v-for="user in mater.users">
+                    {{user.name}}
+                    <li v-for="grade in mater.grades">
+                      <div v-if="user._id === grade.user">
+                        {{grade.value}} / {{grade.total}}
+                      </div>
+                    </li>
+                    <br>
+                  </ul>
+
+                </md-card-content>
+
+              </md-ripple>
+            </md-card>
           </ul>
 
         </md-app-content>

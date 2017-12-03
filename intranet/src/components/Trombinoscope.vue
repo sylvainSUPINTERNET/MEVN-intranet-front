@@ -55,30 +55,52 @@
       </md-app-drawer>
 
       <md-app-content>
-        {{ messageHome }}
-
-        <p v-show="current_user_token">Votre token de connexion est :         {{ current_user_token }}
-        </p>
-
         <!-- {{users[0]}} -->
         <ul v-for="user in users[0]">
-          <li>
-           id : {{ user._id }}
-            <br>
-            name : {{ user.name }}
-            <br>
-            email : {{ user.email }}
-            <br>
-            statut : {{ user.role }}
-            <br>
-            matières : {{ user.maters }}
-            <br>
-            <button v-if="user.role ==='ROLE_ETUDIANT'"  @click="promoteUser(user.role, user._id)">Promote to professeur</button>
-            <button v-if="user.role ==='ROLE_PROFESSEUR'"  @click="promoteUser(user.role, user._id)">Demote to edutiant</button>
-            <br>
-          </li>
+
+          <md-card md-with-hover>
+            <md-ripple>
+              <md-card-header>
+                <div class="md-title"> name : {{ user.name }}</div>
+                <div class="md-subhead">statut : {{ user.role }}</div>
+              </md-card-header>
+
+              <md-card-content>
+                email : {{ user.email }}
+
+                <br>
+                <br>
+                <div class="md-subhead">List of maters</div>
+                <!--
+                <ul>
+                  <li v-for="mater in user.maters">
+                    {{mater.name}}
+                  </li>
+                </ul>
+                -->
+
+                <ul v-for="mater in user.maters">
+                  {{mater.name}}
+                  <li v-for="grade in user.grades">
+                    <div v-if="mater._id === grade.mater">
+                      {{grade.value}} / {{grade.total}}
+                    </div>
+                  </li>
+                  <br>
+                </ul>
+
+              </md-card-content>
+
+              <md-card-actions>
+                <button v-if="user.role ==='ROLE_ETUDIANT'"  @click="promoteUser(user.role, user._id)">Promote to professeur</button>
+                <button v-if="user.role ==='ROLE_PROFESSEUR'"  @click="promoteUser(user.role, user._id)">Demote to edutiant</button>
+                <button @click="deleteUser(user._id, user.name)">Supprimer</button>
+              </md-card-actions>
+            </md-ripple>
+          </md-card>
         </ul>
       </md-app-content>
+
 
     </md-app>
     </div>
@@ -177,6 +199,44 @@
           return array;
 
         },
+
+      deleteUser(user_id, user_name) {
+        axios.post(`http://localhost:1337/user/delete`, {
+          body: user_id
+        })
+          .then(function(response){
+            console.log(response.data.message);
+          })
+          .catch(e => {
+            console.log(e);
+          });
+        //get token decoded user
+        //if reponse api return user name
+
+        let token_current = cookie.get('token')
+
+
+        axios.post(`http://localhost:1337/token/decoded`, {
+          body: token_current
+        })
+          .then(function(response){
+            console.log(response.data.message);
+            console.log("response", response.data.message);
+            console.log(response, user_name) //bug name_current_user undefined
+            if(response.data.message === user_name){
+              console.log("remove token car même user");
+              cookie.remove('token');
+              location.reload();
+            }
+          })
+          .catch(e => {
+            console.log(e);
+          });
+
+        location.reload();
+
+
+      },
       promoteUser(user_role, user_id){
         console.log(user_role, user_id);
         axios.post(`http://localhost:1337/user/promote`, {

@@ -60,11 +60,40 @@
 
       <md-app-content>
         <h2>{{ messageHome }}</h2>
-        <br>
-        token : {{ current_user_token }}
-        <br>
 
-       {{profile[0]}}
+        <md-card>
+          <md-card-header>
+            <md-card-header-text>
+              <div class="md-title"> {{infoToken[0].name}} </div>
+              <div class="md-subhead">{{infoToken[0].role}}</div>
+            </md-card-header-text>
+          </md-card-header>
+
+          <md-card-actions>
+            <md-button>{{infoToken[0].email}}</md-button>
+          </md-card-actions>
+        </md-card>
+
+        <h3>Vos notes</h3>
+        <ul v-for="mater in infoToken[0].maters">
+          {{mater.name}}
+          <li v-for="grade in infoToken[0].grades">
+            <div v-if="mater._id === grade.mater">
+              {{grade.value}} / {{grade.total}}
+            </div>
+          </li>
+        </ul>
+
+        <!--
+        <ul ">
+          <li>
+            {{grade.value}} / {{grade.total}}
+          </li>
+
+        </ul>
+        -->
+
+
       </md-app-content>
 
     </md-app>
@@ -147,7 +176,8 @@
         menuVisible: false,
         messageHome: "Profile",
         current_user_token : cookie.get('token'),
-        profile : this.getProfile(),
+        infoToken : this.getInfoFromToken(),
+
       }
     },
     methods: {
@@ -169,20 +199,25 @@
       goGrade(){
           this.$router.push('/grade');
       },
-      getProfile(){
+      getInfoFromToken(){
         let self = this;
-        let array = []
+        let array = [];
         axios.post(`http://localhost:1337/user/profile`, {
           token: cookie.get('token')
         })
           .then(function(response){
-            console.log(response.data.user_decoded_from_jwt);
-            array.push(response.data.user_decoded_from_jwt)
-            console.log(array);
+            //console.log(response.data.user_decoded_from_jwt);
+            axios.get(`http://localhost:1337/user/profile/${response.data.user_decoded_from_jwt.name}`)
+              .then(function(profile){
+                  console.log(profile);
+                  array.push(profile.data.message);
+              })
           });
-        return array;
 
-      }
+        return array;
+      },
+
+
     }
   }
 </script>
